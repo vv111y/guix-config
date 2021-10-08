@@ -11,30 +11,39 @@
 
 * Dependencies
 #+NAME: dependencies
-#+BEGIN_SRC scheme  :tangle build/guix/felix.scm
+#+BEGIN_SRC scheme  :tangle build/felix.scm
+(add-to-load-path (dirname (current-filename)))
 (use-modules (gnu home)
              (gnu home-services)
              (gnu home-services shells)
              (gnu services)
+             (gnu packages)
              (guix build utils)
              (gnu packages admin)
+             (my-home packages)
              (guix gexp))
 
-(load "../manifests/dotfiles.scm")
+;;(load "../manifests/dotfiles.scm")
 
-(define build-file-service (lambda (file)
-  (simple-service 'load-build-files
-                   home-files-service-type
-                   (list
-                     `((string-append "config/" file)
-                     ,(local-file
-                      (string-append "build/" file) "abc"))))))
+;;(define-syntax foreach
+;; (syntax-rules ()
+;;  ((_ ((variables lists) ...)
+;;    body ...)
+;;   (for-each (lambda (variables ...) body ...) lists ...))))
+
+;;(define build-files-service
+;;  (lambda (%my-file)
+;;    (simple-service 'load-build-files
+;;                     home-files-service-type
+;;                     (list
+;;                      (string-append "config/" %my-file)
+;;                      (local-file %my-file "config")))))
 #+end_src
 
 * home environment
 
 #+name: profiles
-#+begin_src scheme  :tangle build/guix/felix.scm
+#+begin_src scheme  :tangle build/felix.scm
   (home-environment
 #+end_src
 
@@ -42,8 +51,9 @@
 
 Like other configurations you may have seen, I leverage guix's manifest files to organize packages by context.
 #+NAME: profiles
-#+BEGIN_SRC scheme  :tangle build/guix/felix.scm
-  (packages (list "tree"))
+#+BEGIN_SRC scheme  :tangle build/felix.scm
+  (packages (map specification->package+output
+                %my-packages))
 #+END_SRC
 
 ** Home Services (i.e dotfiles)
@@ -51,14 +61,14 @@ Like other configurations you may have seen, I leverage guix's manifest files to
 Guix Home defines "services" not as Shepherd services, like Guix does, but as plugins to perform a build action on your home environment.
 
 #+NAME: home-services
-#+BEGIN_SRC scheme  :tangle build/guix/felix.scm
+#+BEGIN_SRC scheme  :tangle build/felix.scm
 (services
   (list
 #+END_SRC
 
 *** Keyboard
 #+NAME: home-services-keyboard
-#+BEGIN_SRC scheme  :tangle build/guix/felix.scm
+#+BEGIN_SRC scheme  :tangle build/felix.scm
 ;;   (service home-keyboard-service-type
 ;;           (keyboard-layout (keyboard-layout "us"
 ;;                                    #:options '("ctrl:nocaps"))))
@@ -67,7 +77,7 @@ Guix Home defines "services" not as Shepherd services, like Guix does, but as pl
 *** Shells
 **** Bash
 #+NAME: home-services
-#+BEGIN_SRC scheme  :tangle build/guix/felix.scm
+#+BEGIN_SRC scheme  :tangle build/felix.scm
    (service home-bash-service-type
             (home-bash-configuration
              (guix-defaults? #f)
@@ -113,29 +123,22 @@ Guix Home defines "services" not as Shepherd services, like Guix does, but as pl
 
 *** Window Manager
 #+NAME: load-dotfiles
-#+BEGIN_SRC scheme  :tangle build/guix/felix.scm
+#+BEGIN_SRC scheme  :tangle build/felix.scm
 ;; Load a list of dotfiles from build, and map over those to add to .config
-   (map build-file-service dotfiles))))
+;;   (map build-file-service dotfiles))))
 #+END_SRC
 
 #+NAME: load-dotfiles
-#+BEGIN_SRC scheme  :tangle build/guix/felix.scm
+#+BEGIN_SRC scheme  :tangle build/felix.scm
 ;; Load a list of dotfiles from build, and map over those to add to .config
-;;   (map 
-;;     (simple-service 'load-build-files
-;;       home-files-service-type
-;;         (list
-;;           `((string-append "config/" dotfile) ;; config location
-;;           ,(local-file
-;;            (string-append "build/" dotfile "abc")))) dotfiles))))) ;; build location
-#+END_SRC
-
-
-* Operating System Definition
-
-#+NAME: services
-#+BEGIN_SRC scheme  :tangle build/guix/felix.scm
-;;(operating-system
-;;  (inherit desktop-operating-system)
-;;  (host-name "felix"))
+;;(foreach ((file dotfiles))
+;;  (build-files-service(file))))))
+   (simple-service 'various-config-files
+                   home-files-service-type
+                   (list
+                    ;; termite config
+                    `("config/polybar/modules.ini"
+                           ,(local-file "polybar/modules.ini"
+                                        "config")))))))
+;;(build-files-service "polybar/modules.ini"))))
 #+END_SRC

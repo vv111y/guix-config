@@ -41,7 +41,7 @@ If you want a crash course into these tools, check out his [[https://www.youtube
 Guix manages package definitions through [[https://guix.gnu.org/manual/en/html_node/Channels.html#Channels][channels]]. As Guix strongly respects the [[https://www.gnu.org/distros/free-system-distribution-guidelines.html][freedom of computer users]], in order to download non-free software one must include non-free channels. I include one of these below (~nongnu)~, in addition to the default Guix channel definition.
 
 #+NAME: channels
-#+BEGIN_SRC scheme :tangle build/guix/channels.scm
+#+BEGIN_SRC scheme :tangle build/channels.scm
 (list (channel
         (name 'guix)
         (url "https://git.savannah.gnu.org/git/guix.git")
@@ -69,7 +69,7 @@ Guix manages package definitions through [[https://guix.gnu.org/manual/en/html_n
 Define all dependencies we need to to build the base definition.
    
 #+NAME: base-definition 
-#+BEGIN_SRC scheme :tangle build/guix/workstation.scm
+#+BEGIN_SRC scheme :tangle build/workstation.scm
 (define-module (workstation)
   #:use-module (gnu)
   #:use-module (gnu packages)
@@ -98,7 +98,7 @@ Prepare some rules, config to be used in base operating system definition. This 
  Use =libinput= driver for all input devices as it provides more optionality.
 
 #+NAME: base-definition-config
-#+BEGIN_SRC scheme :tangle build/guix/workstation.scm
+#+BEGIN_SRC scheme :tangle build/workstation.scm
 ;; @todo: Move this to where it is used in slim-service-type
 (define %xorg-libinput-config
   "Section \"InputClass\"
@@ -128,7 +128,7 @@ Prepare some rules, config to be used in base operating system definition. This 
 Now that we've prepped module definitions and labeled values to be used in our base operating system, let's define it. All systems inherit from this defintion, both servers and workstations.
 
 #+NAME: base-definition
-#+BEGIN_SRC scheme :tangle build/guix/workstation.scm
+#+BEGIN_SRC scheme :tangle build/workstation.scm
 ;; Base Operating System
 (define-public base-operating-system
   (operating-system
@@ -144,7 +144,7 @@ Now that we've prepped module definitions and labeled values to be used in our b
 Linux-lts kernel is chosen as the nvidia-driver in the nonfree channel was compiled against it. In the future I'd like to move away from lts to get more frequent patches.
 
 #+NAME: kernel 
-#+BEGIN_SRC scheme :tangle build/guix/workstation.scm
+#+BEGIN_SRC scheme :tangle build/workstation.scm
   (kernel linux-lts)
   (firmware (list linux-firmware))
 
@@ -156,7 +156,7 @@ Linux-lts kernel is chosen as the nvidia-driver in the nonfree channel was compi
 Define GRUB as the bootloader for all machines and insert an empty filesystem to be overridden by derivative machines.
 
 #+NAME: file-systems-boot-loader 
-#+BEGIN_SRC scheme :tangle build/guix/workstation.scm
+#+BEGIN_SRC scheme :tangle build/workstation.scm
   ;; Boot settings (UEFI)
   (bootloader
     (bootloader-configuration
@@ -171,7 +171,7 @@ Define GRUB as the bootloader for all machines and insert an empty filesystem to
 Stub out an empty filesystem to be overriden later. Guix complains otherwise.
 
 #+NAME: file-systems-stub
-#+BEGIN_SRC scheme :tangle build/guix/workstation.scm
+#+BEGIN_SRC scheme :tangle build/workstation.scm
   (file-systems (cons*
                  (file-system
                    (mount-point "/tmp")
