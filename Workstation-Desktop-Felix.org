@@ -19,41 +19,39 @@
              (gnu services)
              (gnu packages)
              (guix build utils)
+             (guix monads)
              (gnu packages admin)
              (my-home packages)
              (guix gexp))
 
-;;(load "../manifests/dotfiles.scm")
-
-;;(define-syntax foreach
-;; (syntax-rules ()
-;;  ((_ ((variables lists) ...)
-;;    body ...)
-;;   (for-each (lambda (variables ...) body ...) lists ...))))
-
-;;(define build-files-service
-;;  (lambda (%my-file)
-;;    (simple-service 'load-build-files
-;;                     home-files-service-type
-;;                     (list
-;;                      (string-append "config/" %my-file)
-;;                      (local-file %my-file "config")))))
+(load "manifests/dotfiles.scm")
+(define (build-files-service list-of-dotfiles)
+  (if (null? list-of-dotfiles)
+    '()
+  (let ((config-file (string-append "config/" (car list-of-dotfiles)))
+        (build-file  (string-append "build/" (car list-of-dotfiles))))
+  (cons (simple-service 'load-build-files
+                         home-files-service-type
+                         (list
+                           `(,config-file
+                             ,(local-file build-file "config"))))
+                         (build-files-service (cdr list-of-dotfiles))))))
 #+end_src
 
-* home environment
+* Home Environment
 
 #+name: profiles
 #+begin_src scheme  :tangle build/felix.scm
-  (home-environment
+(home-environment
 #+end_src
 
-** home packages
+** Home Packages
 
 Like other configurations you may have seen, I leverage guix's manifest files to organize packages by context.
 #+NAME: profiles
 #+BEGIN_SRC scheme  :tangle build/felix.scm
-  (packages (map specification->package+output
-                %my-packages))
+(packages (map specification->package+output
+              %my-packages))
 #+END_SRC
 
 ** Home Services (i.e dotfiles)
@@ -63,7 +61,7 @@ Guix Home defines "services" not as Shepherd services, like Guix does, but as pl
 #+NAME: home-services
 #+BEGIN_SRC scheme  :tangle build/felix.scm
 (services
-  (list
+  (append (list
 #+END_SRC
 
 *** Keyboard
@@ -78,67 +76,46 @@ Guix Home defines "services" not as Shepherd services, like Guix does, but as pl
 **** Bash
 #+NAME: home-services
 #+BEGIN_SRC scheme  :tangle build/felix.scm
-   (service home-bash-service-type
-            (home-bash-configuration
-             (guix-defaults? #f)
-             (bashrc '(
-   "# Export 'SHELL' to child processes.  Programs such as 'screen'
-    # honor it and otherwise use /bin/sh.
-    export SHELL
-    
-    # Export 'GUIX_PROFILE'. Sources all guix package environment variables,
-    # for example,if we install python and Python libraries, PYTHONPATH
-    # will be defined.
-    export GUIX_PROFILE=\"$HOME/.guix-profile\"
-    
-    # Few other useful exports
-    export LANG=en_US.UTF-8
-    export LIBGL_ALWAYS_INDIRECT=1 # Silenced a few warnings, otherwise not sure
-    
-    # We are being invoked from a non-interactive shell.  If this
-    # is an SSH session (as in \"ssh host command\"), source
-    # /etc/profile so we get PATH and other essential variables.
-    if [[ $- != *i* ]]
-    then
-        [[ -n \"$SSH_CLIENT\" ]] && source \"$GUIX_PROFILE/etc/profile\"
-    
-        # Don't do anything else.
-        return
-    fi
-    
-    # Source system-wide configuration
-    # i.e run everything in these files
-    source /etc/bashrc
-    source \"$GUIX_PROFILE/etc/profile\"
-    
-    # oh-my-BASH!
-    # https://ohmybash.nntoan.com/
-    export OSH=$HOME/Resources/code/oh-my-bash
-    export OSH_THEME=\"agnoster\"
-    export HYPEN_INSENSITIVE=\"true\"
-    export COMPLETION_WAITING_DOTS=\"true\"
-    source $OSH/oh-my-bash.sh
-    # ~~*~-~*~-~*~~*~-~*~-~*~~*~-~*~-~*~~*~-~*~-~*~**~~*~-~*~-~*~"))))
-#+END_SRC
+(service home-bash-service-type
+        (home-bash-configuration
+          (guix-defaults? #f)
+          (bashrc '("# Export 'SHELL' to child processes.  
+# Programs such as 'screen' honor it and otherwise use /bin/sh.
+export SHELL
 
-*** Window Manager
-#+NAME: load-dotfiles
-#+BEGIN_SRC scheme  :tangle build/felix.scm
-;; Load a list of dotfiles from build, and map over those to add to .config
-;;   (map build-file-service dotfiles))))
-#+END_SRC
+# Export 'GUIX_PROFILE'. Sources all guix package environment variables,
+# for example,if we install python and Python libraries, PYTHONPATH
+# will be defined.
+export GUIX_PROFILE=\"$HOME/.guix-profile\"
+    
+# Few other useful exports
+export LANG=en_US.UTF-8
+export LIBGL_ALWAYS_INDIRECT=1 # Silenced a few warnings, otherwise not sure
+    
+# We are being invoked from a non-interactive shell.  If this
+# is an SSH session (as in \"ssh host command\"), source
+# /etc/profile so we get PATH and other essential variables.
+if [[ $- != *i* ]]
+then
+[[ -n \"$SSH_CLIENT\" ]] && source \"$GUIX_PROFILE/etc/profile\"
+    
+# Don't do anything else.
+return
+fi
+    
+# Source system-wide configuration
+# i.e run everything in these files
+source /etc/bashrc
+source \"$GUIX_PROFILE/etc/profile\"
+    
+# oh-my-BASH!
+# https://ohmybash.nntoan.com/
+export OSH=$HOME/Resources/code/oh-my-bash
+export OSH_THEME=\"agnoster\"
+export HYPEN_INSENSITIVE=\"true\"
+export COMPLETION_WAITING_DOTS=\"true\"
+source $OSH/oh-my-bash.sh
+# ~~*~-~*~-~*~~*~-~*~-~*~~*~-~*~-~*~~*~-~*~-~*~**~~*~-~*~-~*~")))))
 
-#+NAME: load-dotfiles
-#+BEGIN_SRC scheme  :tangle build/felix.scm
-;; Load a list of dotfiles from build, and map over those to add to .config
-;;(foreach ((file dotfiles))
-;;  (build-files-service(file))))))
-   (simple-service 'various-config-files
-                   home-files-service-type
-                   (list
-                    ;; termite config
-                    `("config/polybar/modules.ini"
-                           ,(local-file "polybar/modules.ini"
-                                        "config")))))))
-;;(build-files-service "polybar/modules.ini"))))
+(build-files-service dotfiles))))
 #+END_SRC
