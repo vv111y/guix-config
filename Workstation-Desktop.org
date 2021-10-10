@@ -1,4 +1,4 @@
-#+TITLE: Workstation - Felix - Operating System
+#+TITLE: Workstation Type - Desktop
 #+STARTUP: content
 #+PROPERTY: header-args :mkdirp yes
 #+PROPERTY: header-args:sh :tangle-mode (identity #o555)
@@ -45,9 +45,10 @@ Define all dependencies we need to to build the base definition.
 ** Base Definition
 #+NAME: desktop-operating-system
 #+BEGIN_SRC scheme  :tangle build/desktop.scm
-(operating-system
- (inherit base-operating-system)
- (host-name "felix")
+(define-public desktop-operating-system
+ (operating-system
+   (inherit base-operating-system)
+   (host-name "desktop")
 #+END_SRC
 
 ** Kernel 
@@ -164,7 +165,7 @@ We save most of the package loading for our independent machine definitions. How
 
           (remove (lambda (service)
             (eq? (service-kind service) gdm-service-type))
-		  %desktop-services))))
+		  %desktop-services)))))
 #+END_SRC
 
 * X Window System Components
