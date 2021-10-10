@@ -1,4 +1,4 @@
-#+TITLE: Workstation - Felix
+#+TITLE: Workstation - Desktop - Felix
 #+STARTUP: content
 #+PROPERTY: header-args :tangle-mode (identity #o444) :mkdirp yes
 #+PROPERTY: header-args :tangle-mode (identity #o555)
@@ -7,6 +7,18 @@
 :PROPERTIES:
 :TOC: :include all :ignore this
 :CONTENTS:
+- [[#dependencies][Dependencies]]
+- [[#operating-system-definition][Operating System Definition]]
+- [[#home-environment-definition][Home Environment Definition]]
+  - [[#utility-functions][Utility Functions]]
+  - [[#packages][Packages]]
+  - [[#services][Services]]
+    - [[#keyboard][Keyboard]]
+      - [[#dotfiles][dotfiles]]
+        - [[#manifest][manifest]]
+        - [[#xmodmap][.Xmodmap]]
+    - [[#bash][Bash]]
+    - [[#dotfiles][Dotfiles]]
 :END:
 
 * Dependencies
@@ -87,12 +99,12 @@ This function takes the various dotfiles manifests I have defined in my literate
 *** Keyboard
 Map CAPS LOCK to Control key.
 
-**** manifest
+**** dotfiles
+***** manifest
 #+BEGIN_SRC scheme :noweb-ref dotfiles-manifest :noweb-sep ""
   ".Xmodmap"
 #+END_SRC
-**** dotfiles
-***** Xmodmap
+***** .Xmodmap
 
 #+NAME: home-services-keyboard
 #+BEGIN_SRC conf :tangle build/.Xmodmap

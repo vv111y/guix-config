@@ -1,4 +1,4 @@
-#+TITLE: Workstation Type - Desktop
+#+TITLE: Workstation - Desktop
 #+STARTUP: content
 #+PROPERTY: header-args :mkdirp yes
 #+PROPERTY: header-args:sh :tangle-mode (identity #o555)
@@ -8,6 +8,34 @@
 :PROPERTIES:
 :TOC: :include all :ignore this
 :CONTENTS:
+- [[#operating-system-definition][Operating System Definition]]
+  - [[#dependencies][Dependencies]]
+  - [[#base-definition][Base Definition]]
+  - [[#kernel][Kernel]]
+  - [[#network][Network]]
+  - [[#file-systems][File Systems]]
+    - [[#btrfs][btrfs]]
+    - [[#uefi][UEFI]]
+  - [[#users][Users]]
+  - [[#packages][Packages]]
+    - [[#services][Services]]
+      - [[#shepherd][Shepherd]]
+- [[#x-window-system-components][X Window System Components]]
+  - [[#window-manager][Window Manager]]
+    - [[#openbox][Openbox]]
+      - [[#guix-packages][guix packages]]
+      - [[#dotfiles][dotfiles]]
+        - [[#manifest][manifest]]
+        - [[#openboxautostart][openbox/autostart]]
+        - [[#openboxrcxml][openbox/rc.xml]]
+  - [[#launcher][Launcher]]
+    - [[#rofi][Rofi]]
+      - [[#guix-packages][guix packages]]
+      - [[#dotfiles][dotfiles]]
+        - [[#manifest][manifest]]
+        - [[#rofilaunchersh][rofi/launcher.sh]]
+        - [[#rofithemerasi][rofi/theme.rasi]]
+- [[#export][Export]]
 :END:
 
 * Operating System Definition
