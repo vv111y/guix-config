@@ -1,4 +1,4 @@
-#+TITLE: Workstation - Felix
+#+TITLE: Workstation - Felix - Configuration
 #+STARTUP: content
 #+PROPERTY: header-args :tangle-mode (identity #o444) :mkdirp yes
 #+PROPERTY: header-args :tangle-mode (identity #o555)
@@ -14,19 +14,27 @@
 #+NAME: dependencies
 #+BEGIN_SRC scheme  :tangle build/felix.scm
 (add-to-load-path (dirname (current-filename)))
-(use-modules (gnu home)
-             (gnu home-services)
-             (gnu home-services shells)
-             (gnu services)
-             (gnu packages)
-             (guix build utils)
-             (guix monads)
-             (gnu packages admin)
-             (dl utils)
-             (guix gexp))
+(define-module (felix)
+  #:use-module (gnu home)
+  #:use-module (dl utils)
+  #:use-module (gnu home-services)
+  #:use-module (gnu home-services shells)
+  #:use-module (gnu services)
+  #:use-module (gnu packages)
+  #:use-module (guix build utils)
+  #:use-module (gnu packages admin)
+  #:use-module (guix gexp))
 #+END_SRC
 
-* Utility Functions
+* Home Environment Definition
+
+Here we load most of the software and it's respective configuration I use day-to-day. The list of packages is compiled from the various 'guix-packages' sections found throughout this file and others.
+
+Dotfiles (i.e configuration files) are installed by Guix Home.
+
+Please note: Guix Home defines "services" below, not as Shepherd services, like GuixSD does, but as plugins to perform a build action on your home environment. Do not get them confused.
+
+** Utility Functions
 
 This function takes the various dotfiles manifests I have defined in my literate configuration and maps them to real files managed by guix home.
 
@@ -47,15 +55,9 @@ This function takes the various dotfiles manifests I have defined in my literate
       (dl/generate-dotfiles-services (cdr dotfiles))))))
 #+END_SRC
 
-* Home Environment Definition
+** Packages
 
-Here we load most of the software and it's respective configuration I use day-to-day. The list of packages is compiled from the various 'guix-packages' sections found throughout this file and others.
-
-Dotfiles (i.e configuration files) are installed by Guix Home.
-
-Please note: Guix Home defines "services" below, not as Shepherd services, like GuixSD does, but as plugins to perform a build action on your home environment. Do not get them confused.
-
-#+name: profiles
+#+name: home-environment-base 
 #+begin_src scheme  :tangle build/felix.scm
 (home-environment
   (packages (map specification->package+output %dl-packages))
@@ -66,6 +68,7 @@ Please note: Guix Home defines "services" below, not as Shepherd services, like 
 
 *** Keyboard
 Map CAPS LOCK to Control key.
+
 **** manifest
 #+BEGIN_SRC scheme :noweb-ref dotfiles-manifest :noweb-sep ""
   ".Xmodmap"
@@ -74,7 +77,7 @@ Map CAPS LOCK to Control key.
 ***** Xmodmap
 
 #+NAME: home-services-keyboard
-#+BEGIN_SRC conf :visiblity folded :tangle build/.Xmodmap
+#+BEGIN_SRC conf :tangle build/.Xmodmap
 clear lock
 clear control
 keycode 66 = Control_L

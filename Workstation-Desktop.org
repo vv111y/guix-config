@@ -1,4 +1,4 @@
-#+TITLE: Workstation - Desktop
+#+TITLE: Workstation - Felix - Operating System
 #+STARTUP: content
 #+PROPERTY: header-args :mkdirp yes
 #+PROPERTY: header-args:sh :tangle-mode (identity #o555)
@@ -9,32 +9,6 @@
 :TOC: :include all :ignore this
 :CONTENTS:
 :END:
-
-* Introduction
-
-** What is this?
-
-My entire operating system configuration (guix) with all of my dotfiles defined in Scheme.
-
-** Why?
-
-Reproducible, determinstic builds and our ability to simply declare the state of things has matured so much I had to give this experiment a try. With everything defined in this way, without pulling my hair out I can treat my system as one program, instead of a scattering of dependencies that don't know about each other.
-
-Moreover, every change to my system is now deployed from the [[guix store][guix store]] thanks to [[guix home][guix home]]. This means I get rollbacks, transcational upgrades, fine-grained profiles, and other guix goodness.
-
-Other advantages: theming now becomes easier. It's all here, and I can define one set of colors to be used literally everywhere.
-
-** Okay, I'm intrigured. Anything else?
-
-This file is very large, don't be alarmed. In my editor code sections fold by default, so if you're reading this in code, maybe try reading the rendered org version. The dotfiles, shell scripts, etc. you see below get tangled in later. (see [[org-babel][org-babel]] for more info on tangling)
-
-** Thank you 
-
-*** System Crafters
-
-Thank you [[https://github.com/daviwil][David Wilson]], your incredible video series on Emacs, Guix, and your sample configurations brought me down this journey.
-
-If you want a crash course into these tools, check out his [[https://www.youtube.com/c/SystemCrafters][YouTube series]].
 
 * Operating System Definition
 
@@ -69,11 +43,11 @@ Define all dependencies we need to to build the base definition.
 #+END_SRC
 
 ** Base Definition
-#+NAME: base-definition
+#+NAME: desktop-operating-system
 #+BEGIN_SRC scheme  :tangle build/desktop.scm
 (operating-system
  (inherit base-operating-system)
- (host-name "desktop")
+ (host-name "felix")
 #+END_SRC
 
 ** Kernel 
@@ -203,21 +177,21 @@ I use Openbox primarily on my Desktop, as I find window managers to be too restr
 
 Openbox is great on a big monitor, so it's primarily used on my Desktop. The dotfiles configure boot scripts and visual styles.
 
-***** guix packages
+**** guix packages
 
 #+BEGIN_SRC scheme :noweb-ref packages-manifest :noweb-sep ""
  "openbox"
 #+END_SRC
 
-***** dotfiles
-****** manifest
+**** dotfiles
+***** manifest
 #+BEGIN_SRC scheme :noweb-ref dotfiles-manifest :noweb-sep ""
 
   "openbox/autostart"
   "openbox/rc.xml"
 
 #+END_SRC
-****** openbox/autostart 
+***** openbox/autostart 
 autostart is a simple shell script that runs after Openbox initializes.
 #+BEGIN_SRC shell :visibility :tangle build/openbox/autostart
 # This file generated from guix-config/Workstation-Desktop.org Makefile
@@ -257,7 +231,7 @@ xscreensaver -no-splash &
 picom --xrender-sync-fence --backend xrender --config="$HOME/.config/picom/picom.conf"
 #+END_SRC
 
-****** openbox/rc.xml
+***** openbox/rc.xml
 rc.xml holds the desktop menu, keyboard shortucts, workspaces, window placement, and display settings.
 #+BEGIN_SRC xml :visiblity folded :tangle build/openbox/rc.xml
 <!-- This file generated from guix-config/Workstation-Desktop.org Makefile -->
@@ -950,14 +924,14 @@ rc.xml holds the desktop menu, keyboard shortucts, workspaces, window placement,
 
 Rofi is a quick launcher and how I primarily interface with applications in Openbox.
 
-***** guix packages
+**** guix packages
 
 #+BEGIN_SRC scheme :noweb-ref packages-manifest :noweb-sep ""
  "rofi"
 #+END_SRC
 
-***** dotfiles
-****** manifest
+**** dotfiles
+***** manifest
 #+BEGIN_SRC scheme :noweb-ref dotfiles-manifest :noweb-sep ""
 
   "rofi/launcher.sh"
@@ -965,7 +939,7 @@ Rofi is a quick launcher and how I primarily interface with applications in Open
 
 #+END_SRC
 
-****** rofi/launcher.sh
+***** rofi/launcher.sh
 
 Launches the display defined in theme.rasi.
 
@@ -975,7 +949,7 @@ rofi -no-lazy-grab -show drun -theme theme.rasi
 
 #+END_SRC
 
-****** rofi/theme.rasi
+***** rofi/theme.rasi
 #+BEGIN_SRC conf :visibility :tangle build/rofi/theme.rasi
 configuration {
     drun-display-format: "{icon} {name}";
