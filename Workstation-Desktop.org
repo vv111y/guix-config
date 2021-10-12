@@ -8,34 +8,7 @@
 :PROPERTIES:
 :TOC: :include all :ignore this
 :CONTENTS:
-- [[#operating-system][Operating System]]
-  - [[#dependencies][Dependencies]]
-  - [[#base-definition][Base Definition]]
-  - [[#kernel][Kernel]]
-  - [[#network][Network]]
-  - [[#file-systems][File Systems]]
-    - [[#btrfs][btrfs]]
-    - [[#uefi][UEFI]]
-  - [[#users][Users]]
-  - [[#packages][Packages]]
-    - [[#services][Services]]
-      - [[#shepherd][Shepherd]]
-- [[#x-window-system-components][X Window System Components]]
-  - [[#window-manager][Window Manager]]
-    - [[#openbox][Openbox]]
-      - [[#guix-packages][Guix Packages]]
-      - [[#dotfiles-manifest][Dotfiles Manifest]]
-      - [[#dotfiles][Dotfiles]]
-        - [[#openboxautostart][openbox/autostart]]
-        - [[#openboxrcxml][openbox/rc.xml]]
-  - [[#launcher][Launcher]]
-    - [[#rofi][Rofi]]
-      - [[#guix-packages][Guix Packages]]
-      - [[#dotfiles-manifest][Dotfiles Manifest]]
-      - [[#dotfiles][Dotfiles]]
-        - [[#rofilaunchersh][rofi/launcher.sh]]
-        - [[#rofithemerasi][rofi/theme.rasi]]
-- [[#export][Export]]
+
 :END:
 
 * Operating System
@@ -63,7 +36,8 @@ Define all dependencies we need to to build the base definition.
   #:use-module (gnu services desktop)
   #:use-module (nongnu packages nvidia)
   #:use-module (dl utils) ;; for the dotfiles functions
-  #:use-module (gnu))
+  #:use-module (gnu)
+  #:export (desktop-operating-system))
 
 (define transform
   (options->transformation
